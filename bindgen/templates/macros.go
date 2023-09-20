@@ -51,14 +51,19 @@
 		{%- match func.throws_type() -%}
 		{%- when Some with (throws_type) %}
 		_uniffiRV, _uniffiErr := {% call to_ffi_call(func, prefix) %}
+		var _uniffiDefaultValue {{ return_type|type_name }}
 		if _uniffiErr != nil {
-			var _uniffiDefaultValue {{ return_type|type_name }}
 			return _uniffiDefaultValue, _uniffiErr
 		} else {
-			return {{ return_type|lift_fn }}(_uniffiRV), _uniffiErr
+			liftedValue, err := {{ return_type|lift_fn }}(_uniffiRV)
+			if err != nil {
+				return _uniffiDefaultValue, err
+			}
+			return liftedValue, _uniffiErr
 		}
 		{%- when None %}
-		return {{ return_type|lift_fn }}({% call to_ffi_call(func, prefix) %})
+		liftedValue, _ := {{ return_type|lift_fn }}({% call to_ffi_call(func, prefix) %})
+		return liftedValue
 		{%- endmatch %}
 	{%- when None %}
 		{%- match func.throws_type() -%}

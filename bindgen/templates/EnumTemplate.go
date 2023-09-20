@@ -38,7 +38,7 @@ type {{ e|ffi_converter_name}} struct {}
 
 var {{ e|ffi_converter_name }}INSTANCE = {{ e|ffi_converter_name }}{}
 
-func (c {{ e|ffi_converter_name }}) lift(cRustBuf C.RustBuffer) {{ type_name }} {
+func (c {{ e|ffi_converter_name }}) lift(cRustBuf C.RustBuffer) ({{ type_name }}, error) {
 	return liftFromRustBuffer[{{ type_name }}](c, fromCRustBuffer(cRustBuf))
 }
 
@@ -90,7 +90,7 @@ func ({{ e|ffi_converter_name }}) write(writer io.Writer, value {{ type_name }})
 
 type {{ ffi_destroyer_name }} struct {}
 
-func (_ {{ ffi_destroyer_name }}) destroy(value {{ type_name }}) {
+func ({{ ffi_destroyer_name }}) destroy(value {{ type_name }}) {
 	{%- if e.is_flat() %}
 	{%- else %}
 	value.Destroy()

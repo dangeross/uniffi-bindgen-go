@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */#}
 
 type bufLifter[GoType any] interface {
-	lift(value C.RustBuffer) GoType
+	lift(value C.RustBuffer) (GoType, error)
 }
 
 type bufLowerer[GoType any] interface {
@@ -11,7 +11,7 @@ type bufLowerer[GoType any] interface {
 }
 
 type ffiConverter[GoType any, FfiType any] interface {
-	lift(value FfiType) GoType
+	lift(value FfiType) (GoType, error)
 	lower(value GoType) FfiType
 }
 
@@ -42,15 +42,17 @@ func lowerIntoRustBuffer[GoType any](bufWriter bufWriter[GoType], value GoType) 
 	return stringToCRustBuffer(string(bytes))
 }
 
-func liftFromRustBuffer[GoType any](bufReader bufReader[GoType], rbuf rustBuffer) GoType {
+func liftFromRustBuffer[GoType any](bufReader bufReader[GoType], rbuf rustBuffer) (GoType, error) {
 	defer rbuf.free()
 	reader := rbuf.asReader()
 	item := bufReader.read(reader)
 	if reader.Len() > 0 {
 		// TODO: Remove this
 		leftover, _ := io.ReadAll(reader)
-		panic(fmt.Errorf("Junk remaining in buffer after lifting: %s", string(leftover)))
+
+		var _uniffiDefaultValue GoType
+		return _uniffiDefaultValue, fmt.Errorf("junk remaining in buffer after lifting: %s", string(leftover))
 	}
-	return item
+	return item, nil
 }
 

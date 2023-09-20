@@ -9,15 +9,23 @@ func rustCallWithError[U any](converter bufLifter[error], callback func(*C.RustC
 	case 0:
 		return returnValue, nil
 	case 1:
-		return returnValue, converter.lift(status.errorBuf)
+		liftedErr, err := converter.lift(status.errorBuf)
+		if err != nil {
+			return returnValue, fmt.Errorf("lifting Error: %s", err)
+		}
+		return returnValue, liftedErr
 	case 2:
 		// when the rust code sees a panic, it tries to construct a rustbuffer
 		// with the message.  but if that code panics, then it just sends back
 		// an empty buffer.
 		if status.errorBuf.len > 0 {
-			panic(fmt.Errorf("%s", {{ TypeIdentifier::String.borrow()|lift_fn }}(status.errorBuf)))
+			liftedErr, err := {{ TypeIdentifier::String.borrow()|lift_fn }}(status.errorBuf)
+			if err != nil {
+				return returnValue, fmt.Errorf("panic Error: %s", err)
+			}
+			return returnValue, fmt.Errorf("panic: %s", liftedErr)
 		} else {
-			panic(fmt.Errorf("Rust panicked while handling Rust panic"))
+			return returnValue, fmt.Errorf("rust panicked while handling Rust panic")
 		}
 	default:
 		return returnValue, fmt.Errorf("unknown status code: %d", status.code)

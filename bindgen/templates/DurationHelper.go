@@ -9,7 +9,7 @@ type FfiConverterDuration struct{}
 
 var FfiConverterDurationINSTANCE = FfiConverterDuration{}
 
-func (c FfiConverterDuration) lift(cRustBuf C.RustBuffer) time.Duration {
+func (c FfiConverterDuration) lift(cRustBuf C.RustBuffer) (time.Duration, error) {
 	rustBuffer := fromCRustBuffer(cRustBuf)
 	return liftFromRustBuffer[time.Duration](c, rustBuffer)
 }

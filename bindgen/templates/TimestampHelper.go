@@ -8,7 +8,7 @@ type FfiConverterTimestamp struct{}
 
 var FfiConverterTimestampINSTANCE = FfiConverterTimestamp{}
 
-func (c FfiConverterTimestamp) lift(cRustBuf C.RustBuffer) time.Time {
+func (c FfiConverterTimestamp) lift(cRustBuf C.RustBuffer) (time.Time, error) {
 	rustBuffer := fromCRustBuffer(cRustBuf)
 	return liftFromRustBuffer[time.Time](c, rustBuffer)
 }

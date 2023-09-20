@@ -10,7 +10,7 @@ type {{ ffi_converter_name }} struct{}
 
 var {{ ffi_converter_name }}INSTANCE = {{ ffi_converter_name }}{}
 
-func (c {{ ffi_converter_name }}) lift(cRustBuf C.RustBuffer) {{ type_name }} {
+func (c {{ ffi_converter_name }}) lift(cRustBuf C.RustBuffer) ({{ type_name }}, error) {
 	return liftFromRustBuffer[{{ type_name }}](c, fromCRustBuffer(cRustBuf))
 }
 

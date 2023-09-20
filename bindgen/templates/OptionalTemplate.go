@@ -8,11 +8,11 @@ type {{ ffi_converter_name }} struct{}
 
 var {{ ffi_converter_name }}INSTANCE = {{ ffi_converter_name }}{}
 
-func (c {{ ffi_converter_name }}) lift(cRustBuf C.RustBuffer) {{ type_name }} {
+func (c {{ ffi_converter_name }}) lift(cRustBuf C.RustBuffer) ({{ type_name }}, error) {
 	return liftFromRustBuffer[{{ type_name }}](c, fromCRustBuffer(cRustBuf))
 }
 
-func (_ {{ ffi_converter_name }}) read(reader io.Reader) {{ type_name }} {
+func ({{ ffi_converter_name }}) read(reader io.Reader) {{ type_name }} {
 	if readInt8(reader) == 0 {
 		return nil
 	}
@@ -24,7 +24,7 @@ func (c {{ ffi_converter_name }}) lower(value {{ type_name }}) C.RustBuffer {
 	return lowerIntoRustBuffer[{{ type_name }}](c, value)
 }
 
-func (_ {{ ffi_converter_name }}) write(writer io.Writer, value {{ type_name }}) {
+func ({{ ffi_converter_name }}) write(writer io.Writer, value {{ type_name }}) {
 	if value == nil {
 		writeInt8(writer, 0)
 	} else {
@@ -35,7 +35,7 @@ func (_ {{ ffi_converter_name }}) write(writer io.Writer, value {{ type_name }})
 
 type {{ ffi_destroyer_name }} struct {}
 
-func (_ {{ ffi_destroyer_name }}) destroy(value {{ type_name }}) {
+func ({{ ffi_destroyer_name }}) destroy(value {{ type_name }}) {
 	if value != nil {
 		{{ inner_type|destroy_fn }}(*value)
 	}

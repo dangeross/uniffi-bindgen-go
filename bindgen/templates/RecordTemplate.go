@@ -20,7 +20,7 @@ type {{ rec|ffi_converter_name }} struct {}
 
 var {{ rec|ffi_converter_name }}INSTANCE = {{ rec|ffi_converter_name }}{}
 
-func (c {{ rec|ffi_converter_name }}) lift(cRustBuf C.RustBuffer) {{ type_name }} {
+func (c {{ rec|ffi_converter_name }}) lift(cRustBuf C.RustBuffer) ({{ type_name }}, error) {
 	rustBuffer := fromCRustBuffer(cRustBuf)
 	return liftFromRustBuffer[{{ type_name }}](c, rustBuffer)
 }
@@ -45,6 +45,6 @@ func (c {{ rec|ffi_converter_name }}) write(writer io.Writer, value {{ type_name
 
 type {{ ffi_destroyer_name }} struct {}
 
-func (_ {{ ffi_destroyer_name }}) destroy(value {{ type_name }}) {
+func ({{ ffi_destroyer_name }}) destroy(value {{ type_name }}) {
 	value.Destroy()
 }

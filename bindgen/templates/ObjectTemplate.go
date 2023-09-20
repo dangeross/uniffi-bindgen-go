@@ -43,7 +43,7 @@ type {{ obj|ffi_converter_name }} struct {}
 
 var {{ obj|ffi_converter_name }}INSTANCE = {{ obj|ffi_converter_name }}{}
 
-func (c {{ obj|ffi_converter_name }}) lift(pointer unsafe.Pointer) {{ type_name }} {
+func (c {{ obj|ffi_converter_name }}) lift(pointer unsafe.Pointer) ({{ type_name }}, error) {
 	result := &{{ canonical_name }} {
 		newFfiObject(
 			pointer,
@@ -52,11 +52,12 @@ func (c {{ obj|ffi_converter_name }}) lift(pointer unsafe.Pointer) {{ type_name 
 		}),
 	}
 	runtime.SetFinalizer(result, ({{ type_name }}).Destroy)
-	return result
+	return result, nil
 }
 
 func (c {{ obj|ffi_converter_name }}) read(reader io.Reader) {{ type_name }} {
-	return c.lift(unsafe.Pointer(uintptr(readUint64(reader))))
+	liftedValue, _ := c.lift(unsafe.Pointer(uintptr(readUint64(reader))))
+	return liftedValue
 }
 
 func (c {{ obj|ffi_converter_name }}) lower(value {{ type_name }}) unsafe.Pointer {
@@ -74,6 +75,6 @@ func (c {{ obj|ffi_converter_name }}) write(writer io.Writer, value {{ type_name
 
 type {{ obj|ffi_destroyer_name }} struct {}
 
-func (_ {{ obj|ffi_destroyer_name }}) destroy(value {{ type_name }}) {
+func ({{ obj|ffi_destroyer_name }}) destroy(value {{ type_name }}) {
 	value.Destroy()
 }

@@ -68,7 +68,7 @@ func (err {{ variant_class_name }}) Error() string {
 }
 {%- endif %}
 
-func (self {{ variant_class_name }}) Is(target error) bool {
+func (err {{ variant_class_name }}) Is(target error) bool {
 	return target == Err{{ variant_class_name }}
 }
 
@@ -78,7 +78,7 @@ type {{ e|ffi_converter_name }} struct{}
 
 var {{ e|ffi_converter_name }}INSTANCE = {{ e|ffi_converter_name }}{}
 
-func (c {{ e|ffi_converter_name }}) lift(cErrBuf C.RustBuffer) error {
+func (c {{ e|ffi_converter_name }}) lift(cErrBuf C.RustBuffer) (error, error) {
 	errBuf := fromCRustBuffer(cErrBuf)
 	return liftFromRustBuffer[error](c, errBuf)
 }

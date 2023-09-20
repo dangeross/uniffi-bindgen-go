@@ -8,13 +8,14 @@ type {{ ffi_converter_name }} struct{}
 
 var {{ ffi_converter_name }}INSTANCE = {{ ffi_converter_name }}{}
 
-func ({{ ffi_converter_name }}) lift(cRustBuf C.RustBuffer) string {
+func ({{ ffi_converter_name }}) lift(cRustBuf C.RustBuffer) (string, error) {
 	reader := fromCRustBuffer(cRustBuf).asReader()
 	b, err := io.ReadAll(reader)
 	if err != nil {
-		panic(fmt.Errorf("reading reader: %w", err))
+		var _uniffiDefaultValue string
+		return _uniffiDefaultValue, fmt.Errorf("reading reader: %w", err)
 	}
-	return string(b)
+	return string(b), nil
 }
 
 func ({{ ffi_converter_name }}) read(reader io.Reader) string {
